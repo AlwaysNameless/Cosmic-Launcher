@@ -9,6 +9,7 @@ function App() {
   const [newGame, setNewGame] = useState({ name: "", path: "" });
   const [coverResults, setCoverResults] = useState([]);
   const [selectedCover, setSelectedCover] = useState("");
+  const [contextMenu, setContextMenu] = useState(null);
 
   function addGame() {
     if (newGame.name === "" || newGame.path === "") return;
@@ -59,8 +60,22 @@ function App() {
     }
   }
 
+  function handleRightClick(e, gameId) {
+    e.preventDefault();
+    setContextMenu({ x: e.clientX, y: e.clientY, gameId });
+  }
+
+  function removeGame(gameId) {
+    setGames(games.filter((g) => g.id !== gameId));
+    setContextMenu(null);
+  }
+
+  function closeContextMenu() {
+    setContextMenu(null);
+  }
+
   return (
-    <div className="app">
+    <div className="app" onClick={closeContextMenu}>
       <div className="sidebar">
         <div className="logo">🌃 Cosmic</div>
         <nav>
@@ -144,6 +159,7 @@ function App() {
                 className="game-card"
                 key={game.id}
                 onClick={() => launchGame(game.path)}
+                onContextMenu={(e) => handleRightClick(e, game.id)}
               >
                 <div
                   className="game-cover"
@@ -163,6 +179,21 @@ function App() {
           )}
         </div>
       </div>
+
+      {contextMenu && (
+        <div
+          className="context-menu"
+          style={{ top: contextMenu.y, left: contextMenu.x }}
+          onClick={closeContextMenu}
+        >
+          <button
+            className="context-item delete"
+            onClick={() => removeGame(contextMenu.gameId)}
+          >
+            🗑 Remove Game
+          </button>
+        </div>
+      )}
     </div>
   );
 }

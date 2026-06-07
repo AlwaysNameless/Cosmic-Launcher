@@ -227,3 +227,28 @@ nav {
 .cover-results.selected {
   border-color: #6c47ff;
 }
+
+.context-menu {
+  position: fixed;
+  background-color: #1e1e1e;
+  border: 1px solid #3a3a3a;
+  border-radius: 8px;
+  padding: 6px;
+  z-index: 1000;
+}
+
+.context-item {
+  background: none;
+  border: none;
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  font-size: 14px;
+}
+
+.context-item:hover {
+  background-color: #2a2a2a;
+}
