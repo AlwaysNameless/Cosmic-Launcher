@@ -16,7 +16,10 @@ async fn search_game_covers(name: String) -> Result<Vec<serde_json::Value>, Stri
     let key = "0812c6370f65d5aa635ae5906aa0ed46";
 
     let search_text = client
-        .get(format!("https://www.steamgriddb.com/api/v2/search/autocomplete/{}", name))
+        .get(format!(
+            "https://www.steamgriddb.com/api/v2/search/autocomplete/{}",
+            name
+        ))
         .header("Authorization", format!("Bearer {}", key))
         .send()
         .await
@@ -25,11 +28,17 @@ async fn search_game_covers(name: String) -> Result<Vec<serde_json::Value>, Stri
         .await
         .map_err(|e| e.to_string())?;
 
-    let search_res: serde_json::Value = serde_json::from_str(&search_text).map_err(|e| e.to_string())?;
-    let game_id = search_res["data"][0]["id"].as_u64().ok_or("No game found")?;
+    let search_res: serde_json::Value =
+        serde_json::from_str(&search_text).map_err(|e| e.to_string())?;
+    let game_id = search_res["data"][0]["id"]
+        .as_u64()
+        .ok_or("No game found")?;
 
     let cover_text = client
-        .get(format!("https://www.steamgriddb.com/api/v2/grids/game/{}?dimensions=600x900", game_id))
+        .get(format!(
+            "https://www.steamgriddb.com/api/v2/grids/game/{}?dimensions=600x900",
+            game_id
+        ))
         .header("Authorization", format!("Bearer {}", key))
         .send()
         .await
@@ -38,17 +47,20 @@ async fn search_game_covers(name: String) -> Result<Vec<serde_json::Value>, Stri
         .await
         .map_err(|e| e.to_string())?;
 
-    let cover_res: serde_json::Value = serde_json::from_str(&cover_text).map_err(|e| e.to_string())?;
+    let cover_res: serde_json::Value =
+        serde_json::from_str(&cover_text).map_err(|e| e.to_string())?;
 
     let covers = cover_res["data"]
         .as_array()
         .ok_or("No covers found")?
         .iter()
         .take(5)
-        .map(|img| serde_json::json!({
-            "id": img["id"],
-            "url": img["url"]
-        }))
+        .map(|img| {
+            serde_json::json!({
+                "id": img["id"],
+                "url": img["url"]
+            })
+        })
         .collect();
 
     Ok(covers)
@@ -57,6 +69,7 @@ async fn search_game_covers(name: String) -> Result<Vec<serde_json::Value>, Stri
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())

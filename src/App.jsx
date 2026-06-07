@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { load } from "@tauri-apps/plugin-store";
 import "./App.css";
 import { invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
@@ -10,10 +11,21 @@ function App() {
   const [coverResults, setCoverResults] = useState([]);
   const [selectedCover, setSelectedCover] = useState("");
   const [contextMenu, setContextMenu] = useState(null);
+  const [store, setStore] = useState(null);
+
+  useEffect(() => {
+    async function initStore() {
+      const s = await load("games.json", { autoSave: true });
+      const saved = await s.get("games");
+      if (saved) setGames(saved);
+      setStore(s);
+    }
+    initStore();
+  }, []);
 
   function addGame() {
     if (newGame.name === "" || newGame.path === "") return;
-    setGames([
+    const updated = [
       ...games,
       {
         id: Date.now(),
@@ -21,7 +33,9 @@ function App() {
         path: newGame.path,
         cover: selectedCover,
       },
-    ]);
+    ];
+    setGames(updated);
+    if (store) store.set("games", updated);
     setNewGame({ name: "", path: "" });
     setSelectedCover("");
     setCoverResults([]);
@@ -66,7 +80,9 @@ function App() {
   }
 
   function removeGame(gameId) {
-    setGames(games.filter((g) => g.id !== gameId));
+    const updated = games.filter((g) => g.id !== gameId);
+    setGames(updated);
+    if (store) store.set("games", updated);
     setContextMenu(null);
   }
 
@@ -103,7 +119,6 @@ function App() {
                 value={newGame.name}
                 onChange={handleNameChange}
               />
-
               {coverResults.length > 0 && (
                 <div className="cover-results">
                   {coverResults.map((result) => (
@@ -117,7 +132,6 @@ function App() {
                   ))}
                 </div>
               )}
-
               <div className="path-row">
                 <input
                   className="modal-input"
@@ -131,7 +145,6 @@ function App() {
                   Browse
                 </button>
               </div>
-
               <div className="modal-buttons">
                 <button
                   className="cancel-btn"
