@@ -42,9 +42,14 @@ function App() {
     setShowModal(false);
   }
 
-  async function launchGame(path) {
+  async function launchGame(game) {
     try {
-      await invoke("launch_game", { path });
+      const seconds = await invoke("launch_game", { path: game.path });
+      const updated = games.map((g) =>
+        g.id === game.id ? { ...g, playtime: (g.playtime || 0) + seconds } : g,
+      );
+      setGames(updated);
+      if (store) store.set("games", updated);
     } catch (e) {
       alert("Failed to launch:" + e);
     }
@@ -171,9 +176,14 @@ function App() {
               <div
                 className="game-card"
                 key={game.id}
-                onClick={() => launchGame(game.path)}
+                onClick={() => launchGame(game)}
                 onContextMenu={(e) => handleRightClick(e, game.id)}
               >
+                <div className="game-playtime">
+                  {game.playtime
+                    ? `${Math.floor(game.playtime / 3600)}h ${Math.floor((game.playtime % 3600) / 60)}m`
+                    : "Never played"}
+                </div>
                 <div
                   className="game-cover"
                   style={

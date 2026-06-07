@@ -252,3 +252,11 @@ nav {
 .context-item:hover {
   background-color: #2a2a2a;
 }
+
+.game-playtime {
+  padding: 0 10px 10px;
+  font-size: 11px;
+  color: #444444;
+  color: #666666;
+  font-style: italic;
+}

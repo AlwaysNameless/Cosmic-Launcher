@@ -2,12 +2,18 @@ use std::process::Command;
 use tauri_plugin_http::reqwest;
 
 #[tauri::command]
-fn launch_game(path: String) -> Result<(), String> {
+async fn launch_game(path: String) -> Result<u64, String> {
+    let start = std::time::Instant::now();
+
     Command::new("cmd")
-        .args(["/C", "start", "", &path])
+        .args(["/C", "start", "/wait", "", &path])
         .spawn()
+        .map_err(|e| e.to_string())?
+        .wait()
         .map_err(|e| e.to_string())?;
-    Ok(())
+
+    let elapsed = start.elapsed().as_secs();
+    Ok(elapsed)
 }
 
 #[tauri::command]
