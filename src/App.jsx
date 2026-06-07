@@ -5,6 +5,15 @@ function App() {
   const [games, setGames] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [newGame, setNewGame] = useState({ name: "", path: "" });
+  function addGame() {
+    if (newGame.name === "" || newGame.path === "") return;
+    setGames([
+      ...games,
+      { id: Date.now(), name: newGame.name, path: newGame.path },
+    ]);
+    setNewGame({ name: "", path: "" });
+    setShowModal(false);
+  }
   return (
     <div className="app">
       <div className="sidebar">
@@ -50,7 +59,9 @@ function App() {
                 >
                   Cancel
                 </button>
-                <button className="confirm-btn">Add Game</button>
+                <button className="confirm-btn" onClick={addGame}>
+                  Add Game
+                </button>
               </div>
             </div>
           </div>
