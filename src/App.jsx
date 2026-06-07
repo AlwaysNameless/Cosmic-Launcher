@@ -8,7 +8,7 @@ function App() {
   return (
     <div className="app">
       <div className="sidebar">
-        <div className="logo">🚀 Cosmic</div>
+        <div className="logo">🌃 Cosmic</div>
         <nav>
           <button className="nav-item">Library</button>
           <button className="nav-item">Recent</button>
