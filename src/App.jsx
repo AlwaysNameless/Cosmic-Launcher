@@ -1,19 +1,64 @@
 import { useState } from "react";
 import "./App.css";
+import { invoke } from "@tauri-apps/api/core";
+import { open } from "@tauri-apps/plugin-dialog";
 
 function App() {
   const [games, setGames] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [newGame, setNewGame] = useState({ name: "", path: "" });
+  const [coverResults, setCoverResults] = useState([]);
+  const [selectedCover, setSelectedCover] = useState("");
+
   function addGame() {
     if (newGame.name === "" || newGame.path === "") return;
     setGames([
       ...games,
-      { id: Date.now(), name: newGame.name, path: newGame.path },
+      {
+        id: Date.now(),
+        name: newGame.name,
+        path: newGame.path,
+        cover: selectedCover,
+      },
     ]);
     setNewGame({ name: "", path: "" });
+    setSelectedCover("");
+    setCoverResults([]);
     setShowModal(false);
   }
+
+  async function launchGame(path) {
+    try {
+      await invoke("launch_game", { path });
+    } catch (e) {
+      alert("Failed to launch:" + e);
+    }
+  }
+
+  async function browsePath() {
+    const selected = await open({
+      filters: [{ name: "Executable", extensions: ["exe"] }],
+    });
+    if (selected) {
+      setNewGame({ ...newGame, path: selected });
+    }
+  }
+
+  async function handleNameChange(e) {
+    const name = e.target.value;
+    setNewGame({ ...newGame, name });
+    if (name.length > 2) {
+      try {
+        const results = await invoke("search_game_covers", { name });
+        setCoverResults(results);
+      } catch (e) {
+        console.error(e);
+      }
+    } else {
+      setCoverResults([]);
+    }
+  }
+
   return (
     <div className="app">
       <div className="sidebar">
@@ -32,6 +77,7 @@ function App() {
             + Add Game
           </button>
         </div>
+
         {showModal && (
           <div className="modal-overlay">
             <div className="modal">
@@ -40,18 +86,37 @@ function App() {
                 className="modal-input"
                 placeholder="Game name"
                 value={newGame.name}
-                onChange={(e) =>
-                  setNewGame({ ...newGame, name: e.target.value })
-                }
+                onChange={handleNameChange}
               />
-              <input
-                className="modal-input"
-                placeholder="Path to .exe"
-                value={newGame.path}
-                onChange={(e) =>
-                  setNewGame({ ...newGame, path: e.target.value })
-                }
-              />
+
+              {coverResults.length > 0 && (
+                <div className="cover-results">
+                  {coverResults.map((result) => (
+                    <img
+                      key={result.id}
+                      src={result.url}
+                      alt="cover"
+                      className={`cover-option ${selectedCover === result.url ? "selected" : ""}`}
+                      onClick={() => setSelectedCover(result.url)}
+                    />
+                  ))}
+                </div>
+              )}
+
+              <div className="path-row">
+                <input
+                  className="modal-input"
+                  placeholder="Path to .exe"
+                  value={newGame.path}
+                  onChange={(e) =>
+                    setNewGame({ ...newGame, path: e.target.value })
+                  }
+                />
+                <button className="browse-btn" onClick={browsePath}>
+                  Browse
+                </button>
+              </div>
+
               <div className="modal-buttons">
                 <button
                   className="cancel-btn"
@@ -66,13 +131,36 @@ function App() {
             </div>
           </div>
         )}
+
         <div className="game-grid">
           {games.length === 0 ? (
             <div className="empty-state">
               <p>No games yet.</p>
               <p>Click "+ Add Game" to get started.</p>
             </div>
-          ) : null}
+          ) : (
+            games.map((game) => (
+              <div
+                className="game-card"
+                key={game.id}
+                onClick={() => launchGame(game.path)}
+              >
+                <div
+                  className="game-cover"
+                  style={
+                    game.cover
+                      ? {
+                          backgroundImage: `url(${game.cover})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                        }
+                      : {}
+                  }
+                ></div>
+                <div className="game-name">{game.name}</div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

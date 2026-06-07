@@ -164,3 +164,66 @@ nav {
   cursor: pointer;
   font-weight: 600;
 }
+
+.game-card {
+  background-color: #1e1e1e;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.game-cover {
+  width: 100%;
+  aspect-ratio: 3/4;
+  background-color: #2a2a2a;
+}
+
+.game-name {
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.path-row {
+  display: flex;
+  gap: 8px;
+}
+
+.path-row .modal-input {
+  flex: 1;
+}
+
+.browse-btn {
+  background-color: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  color: #ffffff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.browse-btn:hover {
+  background-color: #3a3a3a;
+}
+
+.cover-results {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 0;
+}
+
+.cover-option {
+  width: 80px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  flex-shrink: 0;
+}
+
+.cover-results.selected {
+  border-color: #6c47ff;
+}
