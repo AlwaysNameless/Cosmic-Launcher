@@ -260,3 +260,31 @@ nav {
   color: #666666;
   font-style: italic;
 }
+
+.category-bar {
+  display: flex;
+  gap: 18px;
+  padding: 0 0 16px 0;
+  flex-wrap: wrap;
+}
+
+.category-btn {
+  background: #1e1e1e;
+  border: 1px solid #3a3a3a;
+  color: #aaaaaa;
+  padding: 6px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.category-btn.active {
+  background: #6c47ff;
+  border-color: #6c47ff;
+  color: #ffffff;
+}
+
+.category-btn:hover {
+  border-color: #6c47ff;
+  color: #ffffff;
+}

@@ -7,11 +7,20 @@ import { open } from "@tauri-apps/plugin-dialog";
 function App() {
   const [games, setGames] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [newGame, setNewGame] = useState({ name: "", path: "" });
+  const [newGame, setNewGame] = useState({ name: "", path: "", category: "" });
   const [coverResults, setCoverResults] = useState([]);
   const [selectedCover, setSelectedCover] = useState("");
   const [contextMenu, setContextMenu] = useState(null);
   const [store, setStore] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [categories] = useState([
+    "All",
+    "Action",
+    "RPG",
+    "Strategy",
+    "Indie",
+    "Other",
+  ]);
 
   useEffect(() => {
     async function initStore() {
@@ -32,11 +41,12 @@ function App() {
         name: newGame.name,
         path: newGame.path,
         cover: selectedCover,
+        category: newGame.category || "Other",
       },
     ];
     setGames(updated);
     if (store) store.set("games", updated);
-    setNewGame({ name: "", path: "" });
+    setNewGame({ name: "", path: "", category: "" });
     setSelectedCover("");
     setCoverResults([]);
     setShowModal(false);
@@ -114,6 +124,18 @@ function App() {
           </button>
         </div>
 
+        <div className="category-bar">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              className={`category-btn ${selectedCategory === cat ? "active" : ""}`}
+              onClick={() => setSelectedCategory(cat)}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
         {showModal && (
           <div className="modal-overlay">
             <div className="modal">
@@ -137,6 +159,22 @@ function App() {
                   ))}
                 </div>
               )}
+              <select
+                className="modal-input"
+                value={newGame.category}
+                onChange={(e) =>
+                  setNewGame({ ...newGame, category: e.target.value })
+                }
+              >
+                <option value="">Select category</option>
+                {categories
+                  .filter((c) => c !== "All")
+                  .map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+              </select>
               <div className="path-row">
                 <input
                   className="modal-input"
@@ -172,33 +210,39 @@ function App() {
               <p>Click "+ Add Game" to get started.</p>
             </div>
           ) : (
-            games.map((game) => (
-              <div
-                className="game-card"
-                key={game.id}
-                onClick={() => launchGame(game)}
-                onContextMenu={(e) => handleRightClick(e, game.id)}
-              >
-                <div className="game-playtime">
-                  {game.playtime
-                    ? `${Math.floor(game.playtime / 3600)}h ${Math.floor((game.playtime % 3600) / 60)}m`
-                    : "Never played"}
-                </div>
+            games
+              .filter(
+                (game) =>
+                  selectedCategory === "All" ||
+                  game.category === selectedCategory,
+              )
+              .map((game) => (
                 <div
-                  className="game-cover"
-                  style={
-                    game.cover
-                      ? {
-                          backgroundImage: `url(${game.cover})`,
-                          backgroundSize: "cover",
-                          backgroundPosition: "center",
-                        }
-                      : {}
-                  }
-                ></div>
-                <div className="game-name">{game.name}</div>
-              </div>
-            ))
+                  className="game-card"
+                  key={game.id}
+                  onClick={() => launchGame(game)}
+                  onContextMenu={(e) => handleRightClick(e, game.id)}
+                >
+                  <div
+                    className="game-cover"
+                    style={
+                      game.cover
+                        ? {
+                            backgroundImage: `url(${game.cover})`,
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                          }
+                        : {}
+                    }
+                  ></div>
+                  <div className="game-name">{game.name}</div>
+                  <div className="game-playtime">
+                    {game.playtime
+                      ? `${Math.floor(game.playtime / 3600)}h ${Math.floor((game.playtime % 3600) / 60)}m`
+                      : "Never played"}
+                  </div>
+                </div>
+              ))
           )}
         </div>
       </div>
