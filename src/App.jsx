@@ -22,6 +22,7 @@ function App() {
     "Other",
   ]);
   const [recentGames, setRecentGames] = useState([]);
+  const [currentView, setCurrentView] = useState("library");
 
   useEffect(() => {
     async function initStore() {
@@ -129,190 +130,130 @@ function App() {
       <div className="sidebar">
         <div className="logo">🌃 Cosmic</div>
         <nav>
-          <button className="nav-item">Library</button>
-          <button className="nav-item">Settings</button>
+          <button
+            className={`nav-item ${currentView === "library" ? "active" : ""}`}
+            onClick={() => setCurrentView("library")}
+          >
+            Library
+          </button>
+          <button
+            className={`nav-item ${currentView === "settings" ? "active" : ""}`}
+            onClick={() => setCurrentView("settings")}
+          >
+            Settings
+          </button>
         </nav>
       </div>
 
       <div className="main">
-        <div className="topbar">
-          <h1>Library</h1>
-          <button className="add-btn" onClick={() => setShowModal(true)}>
-            + Add Game
-          </button>
-        </div>
-
-        <div className="category-bar">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              className={`category-btn ${selectedCategory === cat ? "active" : ""}`}
-              onClick={() => setSelectedCategory(cat)}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        {showModal && (
-          <div className="modal-overlay">
-            <div className="modal">
-              <h2>Add Game</h2>
-              <input
-                className="modal-input"
-                placeholder="Game name"
-                value={newGame.name}
-                onChange={handleNameChange}
-              />
-              {coverResults.length > 0 && (
-                <div className="cover-results">
-                  {coverResults.map((result) => (
-                    <img
-                      key={result.id}
-                      src={result.url}
-                      alt="cover"
-                      className={`cover-option ${selectedCover === result.url ? "selected" : ""}`}
-                      onClick={() => setSelectedCover(result.url)}
-                    />
-                  ))}
-                </div>
-              )}
-              <select
-                className="modal-input"
-                value={newGame.category}
-                onChange={(e) =>
-                  setNewGame({ ...newGame, category: e.target.value })
-                }
-              >
-                <option value="">Select category</option>
-                {categories
-                  .filter((c) => c !== "All")
-                  .map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat}
-                    </option>
-                  ))}
-              </select>
-              <div className="path-row">
-                <input
-                  className="modal-input"
-                  placeholder="Path to .exe"
-                  value={newGame.path}
-                  onChange={(e) =>
-                    setNewGame({ ...newGame, path: e.target.value })
-                  }
-                />
-                <button className="browse-btn" onClick={browsePath}>
-                  Browse
-                </button>
-              </div>
-              <div className="modal-buttons">
-                <button
-                  className="cancel-btn"
-                  onClick={() => setShowModal(false)}
-                >
-                  Cancel
-                </button>
-                <button className="confirm-btn" onClick={addGame}>
-                  Add Game
-                </button>
-              </div>
+        {currentView === "library" && (
+          <>
+            <div className="topbar">
+              <h1>Library</h1>
+              <button className="add-btn" onClick={() => setShowModal(true)}>
+                + Add Game
+              </button>
             </div>
-          </div>
-        )}
-        {recentGames.length > 0 && (
-          <div className="recent-section">
-            <h2 className="section-title">Recently Played</h2>
-            <div className="recent-grid">
-              {recentGames.map((game) => (
-                <div
-                  className="game-card"
-                  key={game.id}
-                  onClick={() => launchGame(game)}
-                  onContextMenu={(e) => handleRightClick(e, game.id)}
+
+            <div className="category-bar">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  className={`category-btn ${selectedCategory === cat ? "active" : ""}`}
+                  onClick={() => setSelectedCategory(cat)}
                 >
-                  <div
-                    className="game-cover"
-                    style={
-                      game.cover
-                        ? {
-                            backgroundImage: `url(${game.cover})`,
-                            backgroundSize: "cover",
-                            backgroundPosition: "center",
-                          }
-                        : {}
-                    }
-                  ></div>
-                  <div className="game-name">{game.name}</div>
-                  <div className="game-playtime">
-                    {game.playtime
-                      ? `${Math.floor(game.playtime / 3600)}h ${Math.floor((game.playtime % 3600) / 60)}m`
-                      : "Never played"}
-                  </div>
-                </div>
+                  {cat}
+                </button>
               ))}
             </div>
-          </div>
+
+            {recentGames.length > 0 && (
+              <div className="recent-section">
+                <h2 className="section-title">Recently Played</h2>
+                <div className="recent-grid">
+                  {recentGames.map((game) => (
+                    <div
+                      className="game-card"
+                      key={game.id}
+                      onClick={() => launchGame(game)}
+                      onContextMenu={(e) => handleRightClick(e, game.id)}
+                    >
+                      <div
+                        className="game-cover"
+                        style={
+                          game.cover
+                            ? {
+                                backgroundImage: `url(${game.cover})`,
+                                backgroundSize: "cover",
+                                backgroundPosition: "center",
+                              }
+                            : {}
+                        }
+                      ></div>
+                      <div className="game-name">{game.name}</div>
+                      <div className="game-playtime">
+                        {game.playtime
+                          ? `${Math.floor(game.playtime / 3600)}h ${Math.floor((game.playtime % 3600) / 60)}m`
+                          : "Never played"}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="game-grid">
+              {games.length === 0 ? (
+                <div className="empty-state">
+                  <p>No games yet.</p>
+                  <p>Click "+ Add Game" to get started.</p>
+                </div>
+              ) : (
+                games
+                  .filter(
+                    (game) =>
+                      selectedCategory === "All" ||
+                      game.category === selectedCategory,
+                  )
+                  .map((game) => (
+                    <div
+                      className="game-card"
+                      key={game.id}
+                      onClick={() => launchGame(game)}
+                      onContextMenu={(e) => handleRightClick(e, game.id)}
+                    >
+                      <div
+                        className="game-cover"
+                        style={
+                          game.cover
+                            ? {
+                                backgroundImage: `url(${game.cover})`,
+                                backgroundSize: "cover",
+                                backgroundPosition: "center",
+                              }
+                            : {}
+                        }
+                      ></div>
+                      <div className="game-name">{game.name}</div>
+                      <div className="game-playtime">
+                        {game.playtime
+                          ? `${Math.floor(game.playtime / 3600)}h ${Math.floor((game.playtime % 3600) / 60)}m`
+                          : "Never played"}
+                      </div>
+                    </div>
+                  ))
+              )}
+            </div>
+          </>
         )}
 
-        <div className="game-grid">
-          {games.length === 0 ? (
-            <div className="empty-state">
-              <p>No games yet.</p>
-              <p>Click "+ Add Game" to get started.</p>
-            </div>
-          ) : (
-            games
-              .filter(
-                (game) =>
-                  selectedCategory === "All" ||
-                  game.category === selectedCategory,
-              )
-              .map((game) => (
-                <div
-                  className="game-card"
-                  key={game.id}
-                  onClick={() => launchGame(game)}
-                  onContextMenu={(e) => handleRightClick(e, game.id)}
-                >
-                  <div
-                    className="game-cover"
-                    style={
-                      game.cover
-                        ? {
-                            backgroundImage: `url(${game.cover})`,
-                            backgroundSize: "cover",
-                            backgroundPosition: "center",
-                          }
-                        : {}
-                    }
-                  ></div>
-                  <div className="game-name">{game.name}</div>
-                  <div className="game-playtime">
-                    {game.playtime
-                      ? `${Math.floor(game.playtime / 3600)}h ${Math.floor((game.playtime % 3600) / 60)}m`
-                      : "Never played"}
-                  </div>
-                </div>
-              ))
-          )}
-        </div>
+        {currentView === "settings" && (
+          <div className="settings-page">
+            <h1>Settings</h1>
+            <p style={{ color: "#aaaaaa" }}>Coming soon...</p>
+          </div>
+        )}
       </div>
-
-      {contextMenu && (
-        <div
-          className="context-menu"
-          style={{ top: contextMenu.y, left: contextMenu.x }}
-          onClick={closeContextMenu}
-        >
-          <button
-            className="context-item delete"
-            onClick={() => removeGame(contextMenu.gameId)}
-          >
-            🗑 Remove Game
-          </button>
-        </div>
-      )}
     </div>
   );
 }
