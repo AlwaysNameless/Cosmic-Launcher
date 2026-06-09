@@ -72,7 +72,7 @@ nav {
 }
 
 .add-btn {
-  background-color: #6c47ff;
+  background-color: var(--accent);
   color: #ffffff;
   border: none;
   padding: 10px 20px;
@@ -137,7 +137,7 @@ nav {
 }
 
 .modal-input:focus {
-  border-color: #6c47ff;
+  border-color: var(--accent);
 }
 
 .modal-buttons {
@@ -156,7 +156,7 @@ nav {
 }
 
 .confirm-btn {
-  background-color: #6c47ff;
+  background-color: var(--accent);
   border: none;
   color: #ffffff;
   padding: 8px 16px;
@@ -225,7 +225,7 @@ nav {
 }
 
 .cover-results.selected {
-  border-color: #6c47ff;
+  border-color: var(--accent);
 }
 
 .context-menu {
@@ -279,13 +279,13 @@ nav {
 }
 
 .category-btn.active {
-  background: #6c47ff;
-  border-color: #6c47ff;
+  background: var(--accent);
+  border-color: var(--accent);
   color: #ffffff;
 }
 
 .category-btn:hover {
-  border-color: #6c47ff;
+  border-color: var(--accent);
   color: #ffffff;
 }
 
@@ -305,4 +305,57 @@ nav {
   display: flex;
   gap: 16px;
   overflow-x: auto;
+}
+
+.settings-page {
+  padding: 0;
+}
+
+.settings-section {
+  margin-bottom: 32px;
+}
+
+.settings-label {
+  font-size: 13px;
+  color: #aaaaaa;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.color-options {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.color-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.color-swatch {
+  border-color: #ffffff;
+}
+
+.color-picker {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  background: none;
+  overflow: hidden;
+  -webkit-appearance: none;
+}
+.color-picker::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+.color-picker::-webkit-color-swatch {
+  border: none;
+  border-radius: 50%;
 }

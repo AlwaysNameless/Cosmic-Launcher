@@ -23,6 +23,7 @@ function App() {
   ]);
   const [recentGames, setRecentGames] = useState([]);
   const [currentView, setCurrentView] = useState("library");
+  const [accentColor, setAccentColor] = useState("#6c47ff");
 
   useEffect(() => {
     async function initStore() {
@@ -36,10 +37,16 @@ function App() {
           .slice(0, 5);
         setRecentGames(recent);
       }
+      const savedAccent = await s.get("accentColor");
+      if (savedAccent) setAccentColor(savedAccent);
       setStore(s);
     }
     initStore();
   }, []);
+  useEffect(() => {
+    document.documentElement.style.setProperty("--accent", accentColor);
+    if (store) store.set("accentColor", accentColor);
+  }, [accentColor, store]);
 
   function addGame() {
     if (newGame.name === "" || newGame.path === "") return;
@@ -250,7 +257,33 @@ function App() {
         {currentView === "settings" && (
           <div className="settings-page">
             <h1>Settings</h1>
-            <p style={{ color: "#aaaaaa" }}>Coming soon...</p>
+
+            <div className="settings-section">
+              <h2 className="settings-label">Accent Color</h2>
+              <div className="color-options">
+                {[
+                  "#6c47ff",
+                  "#ff4757",
+                  "#2ed573",
+                  "#1e90ff",
+                  "#ff6b81",
+                  "#ffa502",
+                ].map((color) => (
+                  <div
+                    key={color}
+                    className={`color-swatch ${accentColor === color ? "selected" : ""}`}
+                    style={{ backgroundColor: color }}
+                    onClick={() => setAccentColor(color)}
+                  />
+                ))}
+                <input
+                  type="color"
+                  value={accentColor}
+                  onChange={(e) => setAccentColor(e.target.value)}
+                  className="color-picker"
+                />
+              </div>
+            </div>
           </div>
         )}
       </div>
