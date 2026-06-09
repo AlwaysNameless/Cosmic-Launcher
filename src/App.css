@@ -288,3 +288,21 @@ nav {
   border-color: #6c47ff;
   color: #ffffff;
 }
+
+.recent-section {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 14px;
+  color: #aaaaaa;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.recent-grid {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+}

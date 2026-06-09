@@ -21,12 +21,20 @@ function App() {
     "Indie",
     "Other",
   ]);
+  const [recentGames, setRecentGames] = useState([]);
 
   useEffect(() => {
     async function initStore() {
       const s = await load("games.json", { autoSave: true });
       const saved = await s.get("games");
-      if (saved) setGames(saved);
+      if (saved) {
+        setGames(saved);
+        const recent = [...saved]
+          .filter((g) => g.lastPlayed)
+          .sort((a, b) => b.lastPlayed - a.lastPlayed)
+          .slice(0, 5);
+        setRecentGames(recent);
+      }
       setStore(s);
     }
     initStore();
@@ -56,15 +64,26 @@ function App() {
     try {
       const seconds = await invoke("launch_game", { path: game.path });
       const updated = games.map((g) =>
-        g.id === game.id ? { ...g, playtime: (g.playtime || 0) + seconds } : g,
+        g.id === game.id
+          ? {
+              ...g,
+              playtime: (g.playtime || 0) + seconds,
+              lastPlayed: Date.now(),
+            }
+          : g,
       );
       setGames(updated);
       if (store) store.set("games", updated);
+
+      const recent = [...updated]
+        .filter((g) => g.lastPlayed)
+        .sort((a, b) => b.lastPlayed - a.lastPlayed)
+        .slice(0, 5);
+      setRecentGames(recent);
     } catch (e) {
       alert("Failed to launch:" + e);
     }
   }
-
   async function browsePath() {
     const selected = await open({
       filters: [{ name: "Executable", extensions: ["exe"] }],
@@ -111,7 +130,6 @@ function App() {
         <div className="logo">🌃 Cosmic</div>
         <nav>
           <button className="nav-item">Library</button>
-          <button className="nav-item">Recent</button>
           <button className="nav-item">Settings</button>
         </nav>
       </div>
@@ -199,6 +217,40 @@ function App() {
                   Add Game
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+        {recentGames.length > 0 && (
+          <div className="recent-section">
+            <h2 className="section-title">Recently Played</h2>
+            <div className="recent-grid">
+              {recentGames.map((game) => (
+                <div
+                  className="game-card"
+                  key={game.id}
+                  onClick={() => launchGame(game)}
+                  onContextMenu={(e) => handleRightClick(e, game.id)}
+                >
+                  <div
+                    className="game-cover"
+                    style={
+                      game.cover
+                        ? {
+                            backgroundImage: `url(${game.cover})`,
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                          }
+                        : {}
+                    }
+                  ></div>
+                  <div className="game-name">{game.name}</div>
+                  <div className="game-playtime">
+                    {game.playtime
+                      ? `${Math.floor(game.playtime / 3600)}h ${Math.floor((game.playtime % 3600) / 60)}m`
+                      : "Never played"}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
