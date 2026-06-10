@@ -3,6 +3,7 @@ import { load } from "@tauri-apps/plugin-store";
 import "./App.css";
 import { invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
+import { openUrl } from "@tauri-apps/plugin-opener";
 
 function App() {
   const [games, setGames] = useState([]);
@@ -246,8 +247,17 @@ function App() {
             <div className={`game-grid ${gridSize}`}>
               {games.length === 0 ? (
                 <div className="empty-state">
-                  <p>No games yet.</p>
-                  <p>Click "+ Add Game" to get started.</p>
+                  <div className="empty-icon">🎮</div>
+                  <p>No games yet</p>
+                  <p className="empty-sub">
+                    Click "+ Add Game" to build your library
+                  </p>
+                  <button
+                    className="add-btn"
+                    onClick={() => setShowModal(true)}
+                  >
+                    + Add Game
+                  </button>
                 </div>
               ) : (
                 games
@@ -366,6 +376,25 @@ function App() {
                 />
                 <button className="confirm-btn" onClick={addCategory}>
                   Add
+                </button>
+              </div>
+            </div>
+
+            <div className="settings-section">
+              <h2 className="settings-label">About</h2>
+              <div className="about-card">
+                <div className="about-logo">🌃 Cosmic Launcher</div>
+                <div className="about-version">Version 1.0.0</div>
+                <div className="about-credit">
+                  Made by <span className="about-name">AlwaysNameless</span>
+                </div>
+                <button
+                  className="about-link"
+                  onClick={() =>
+                    openUrl("https://github.com/AlwaysNameless/Cosmic-Launcher")
+                  }
+                >
+                  View on GitHub →
                 </button>
               </div>
             </div>

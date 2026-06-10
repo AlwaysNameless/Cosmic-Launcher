@@ -3,11 +3,6 @@
   padding: 0;
   box-sizing: border-box;
 }
-.main {
-  flex: 1;
-  padding: 32px;
-  overflow-y: auto;
-}
 
 body {
   background-color: #0f0f0f;
@@ -29,6 +24,7 @@ body {
   flex-direction: column;
   gap: 32px;
   border-right: 1px solid #2a2a2a;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.3);
 }
 
 .logo {
@@ -52,11 +48,35 @@ nav {
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
+  transition: all 0.15s ease;
 }
 
 .nav-item:hover {
   background-color: #2a2a2a;
   color: #ffffff;
+}
+
+.nav-item.active {
+  background-color: #2a2a2a;
+  color: #ffffff;
+}
+
+.main {
+  flex: 1;
+  padding: 32px;
+  overflow-y: auto;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .topbar {
@@ -80,10 +100,12 @@ nav {
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
+  transition: all 0.15s ease;
 }
 
 .add-btn:hover {
-  background-color: #7c57ff;
+  opacity: 0.85;
+  transform: translateY(-1px);
 }
 
 .game-grid {
@@ -92,11 +114,34 @@ nav {
   gap: 20px;
 }
 
+.game-grid.small .game-card {
+  width: 120px;
+}
+.game-grid.medium .game-card {
+  width: 160px;
+}
+.game-grid.large .game-card {
+  width: 200px;
+}
+
 .empty-state {
-  color: #555555;
+  grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  gap: 12px;
+  padding: 80px 0;
+  color: #555555;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+.empty-sub {
+  font-size: 13px;
+  color: #444444;
 }
 
 .modal-overlay {
@@ -109,6 +154,7 @@ nav {
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 100;
 }
 
 .modal {
@@ -119,6 +165,7 @@ nav {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
 }
 
 .modal h2 {
@@ -134,8 +181,14 @@ nav {
   border-radius: 8px;
   font-size: 14px;
   outline: none;
+  width: 100%;
 }
-
+.modal .modal-input {
+  width: 100%;
+}
+.add-category-row .modal-input {
+  width: 200px;
+}
 .modal-input:focus {
   border-color: var(--accent);
 }
@@ -153,6 +206,12 @@ nav {
   padding: 8px 16px;
   border-radius: 8px;
   cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cancel-btn:hover {
+  border-color: #888888;
+  color: #ffffff;
 }
 
 .confirm-btn {
@@ -163,6 +222,11 @@ nav {
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
+  transition: opacity 0.15s ease;
+}
+
+.confirm-btn:hover {
+  opacity: 0.85;
 }
 
 .game-card {
@@ -170,6 +234,14 @@ nav {
   border-radius: 10px;
   overflow: hidden;
   cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.game-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
 .game-cover {
@@ -179,9 +251,19 @@ nav {
 }
 
 .game-name {
-  padding: 10px;
+  padding: 10px 10px 4px;
   font-size: 13px;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.game-playtime {
+  padding: 0 10px 10px;
+  font-size: 11px;
+  color: #666666;
+  font-style: italic;
 }
 
 .path-row {
@@ -201,6 +283,7 @@ nav {
   border-radius: 8px;
   cursor: pointer;
   white-space: nowrap;
+  transition: all 0.15s ease;
 }
 
 .browse-btn:hover {
@@ -222,9 +305,16 @@ nav {
   cursor: pointer;
   border: 2px solid transparent;
   flex-shrink: 0;
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease;
 }
 
-.cover-results.selected {
+.cover-option:hover {
+  transform: scale(1.05);
+}
+
+.cover-option.selected {
   border-color: var(--accent);
 }
 
@@ -249,21 +339,17 @@ nav {
   font-size: 14px;
 }
 
+.context-item.delete {
+  color: #ff4d4d;
+}
+
 .context-item:hover {
   background-color: #2a2a2a;
 }
 
-.game-playtime {
-  padding: 0 10px 10px;
-  font-size: 11px;
-  color: #444444;
-  color: #666666;
-  font-style: italic;
-}
-
 .category-bar {
   display: flex;
-  gap: 18px;
+  gap: 8px;
   padding: 0 0 16px 0;
   flex-wrap: wrap;
 }
@@ -276,6 +362,7 @@ nav {
   border-radius: 20px;
   cursor: pointer;
   font-size: 13px;
+  transition: all 0.15s ease;
 }
 
 .category-btn.active {
@@ -305,6 +392,7 @@ nav {
   display: flex;
   gap: 16px;
   overflow-x: auto;
+  padding-bottom: 8px;
 }
 
 .settings-page {
@@ -335,6 +423,11 @@ nav {
   border-radius: 50%;
   cursor: pointer;
   border: 2px solid transparent;
+  transition: transform 0.15s ease;
+}
+
+.color-swatch:hover {
+  transform: scale(1.1);
 }
 
 .color-swatch.selected {
@@ -352,9 +445,11 @@ nav {
   overflow: hidden;
   -webkit-appearance: none;
 }
+
 .color-picker::-webkit-color-swatch-wrapper {
   padding: 0;
 }
+
 .color-picker::-webkit-color-swatch {
   border: none;
   border-radius: 50%;
@@ -373,22 +468,13 @@ nav {
   border-radius: 8px;
   cursor: pointer;
   font-size: 13px;
+  transition: all 0.15s ease;
 }
 
 .grid-size-btn.active {
   background-color: var(--accent);
   border-color: var(--accent);
   color: #ffffff;
-}
-
-.game-grid.small .game-card {
-  width: 120px;
-}
-.game-grid.medium .game-card {
-  width: 160px;
-}
-.game-grid.large .game-card {
-  width: 200px;
 }
 
 .category-tags {
@@ -415,6 +501,7 @@ nav {
   color: #aaaaaa;
   font-size: 16px;
   line-height: 1;
+  transition: color 0.15s ease;
 }
 
 .remove-cat:hover {
@@ -435,6 +522,7 @@ nav {
   cursor: pointer;
   margin-bottom: 24px;
   padding: 0;
+  transition: color 0.15s ease;
 }
 
 .back-btn:hover {
@@ -459,6 +547,7 @@ nav {
   border-radius: 12px;
   background-size: cover;
   background-position: center;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
 }
 
 .details-info {
@@ -484,7 +573,19 @@ nav {
   gap: 12px;
 }
 
-.nav-item.active {
-  background-color: #2a2a2a;
-  color: #ffffff;
+.about-link {
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: #aaaaaa;
+  text-decoration: none;
+  margin-top: 8px;
+  transition: color 0.15s ease;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.about-link:hover {
+  color: var(--accent);
 }
