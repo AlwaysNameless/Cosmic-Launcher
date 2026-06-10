@@ -13,7 +13,7 @@ function App() {
   const [contextMenu, setContextMenu] = useState(null);
   const [store, setStore] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [categories] = useState([
+  const [categories, setCategories] = useState([
     "All",
     "Action",
     "RPG",
@@ -21,6 +21,7 @@ function App() {
     "Indie",
     "Other",
   ]);
+  const [newCategory, setNewCategory] = useState("");
   const [recentGames, setRecentGames] = useState([]);
   const [currentView, setCurrentView] = useState("library");
   const [accentColor, setAccentColor] = useState("#6c47ff");
@@ -42,6 +43,8 @@ function App() {
       if (savedAccent) setAccentColor(savedAccent);
       const savedGrid = await s.get("gridSize");
       if (savedGrid) setGridSize(savedGrid);
+      const savedCategories = await s.get("categories");
+      if (savedCategories) setCategories(savedCategories);
       setStore(s);
     }
     initStore();
@@ -55,6 +58,10 @@ function App() {
   useEffect(() => {
     if (store) store.set("gridSize", gridSize);
   }, [gridSize, store]);
+
+  useEffect(() => {
+    if (store) store.set("categories", categories);
+  }, [categories, store]);
 
   function addGame() {
     if (newGame.name === "" || newGame.path === "") return;
@@ -138,6 +145,17 @@ function App() {
 
   function closeContextMenu() {
     setContextMenu(null);
+  }
+
+  function addCategory() {
+    const trimmed = newCategory.trim();
+    if (!trimmed || categories.includes(trimmed)) return;
+    setCategories([...categories, trimmed]);
+    setNewCategory("");
+  }
+  function removeCategory(cat) {
+    if (cat === "All" || cat === "Other") return;
+    setCategories(categories.filter((c) => c !== cat));
   }
 
   return (
@@ -305,6 +323,38 @@ function App() {
                     {size.charAt(0).toUpperCase() + size.slice(1)}
                   </button>
                 ))}
+              </div>
+            </div>
+            <div className="settings-section">
+              <h2 className="settings-label">Categories</h2>
+              <div className="category-tags">
+                {categories
+                  .filter((c) => c !== "All")
+                  .map((cat) => (
+                    <div key={cat} className="category-tag">
+                      {cat}
+                      {cat !== "Other" && (
+                        <span
+                          className="remove-cat"
+                          onClick={() => removeCategory(cat)}
+                        >
+                          ×
+                        </span>
+                      )}
+                    </div>
+                  ))}
+              </div>
+              <div className="add-category-row">
+                <input
+                  className="modal-input"
+                  placeholder="New category..."
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && addCategory()}
+                />
+                <button className="confirm-btn" onClick={addCategory}>
+                  Add
+                </button>
               </div>
             </div>
           </div>

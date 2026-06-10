@@ -337,7 +337,7 @@ nav {
   border: 2px solid transparent;
 }
 
-.color-swatch {
+.color-swatch.selected {
   border-color: #ffffff;
 }
 
@@ -389,4 +389,40 @@ nav {
 }
 .game-grid.large .game-card {
   width: 200px;
+}
+
+.category-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.category-tag {
+  background: #1e1e1e;
+  border: 1px solid #3a3a3a;
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.remove-cat {
+  cursor: pointer;
+  color: #aaaaaa;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.remove-cat:hover {
+  color: #ff4d4d;
+}
+
+.add-category-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
