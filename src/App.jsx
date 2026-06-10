@@ -6,6 +6,7 @@ import { open } from "@tauri-apps/plugin-dialog";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { check } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
+import cosmicLogo from "./assets/logo.png"; // or .jpg / .svg depending on your file extension
 
 function App() {
   const [games, setGames] = useState([]);
@@ -184,7 +185,11 @@ function App() {
   return (
     <div className="app" onClick={closeContextMenu}>
       <div className="sidebar">
-        <div className="logo">🌃 Cosmic</div>
+        <div className="logo">
+          <img className="logo-image" src={cosmicLogo} alt="Cosmic-Logo" />
+          Cosmic
+        </div>
+
         <nav>
           <button
             className={`nav-item ${currentView === "library" ? "active" : ""}`}

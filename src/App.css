@@ -28,9 +28,18 @@ body {
 }
 
 .logo {
-  font-size: 20px;
-  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 22px;
+  font-weight: 800;
   color: #ffffff;
+  letter-spacing: -0.5px;
+}
+.logo-image {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
 }
 
 nav {
