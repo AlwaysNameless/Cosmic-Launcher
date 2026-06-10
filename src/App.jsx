@@ -24,6 +24,7 @@ function App() {
   const [recentGames, setRecentGames] = useState([]);
   const [currentView, setCurrentView] = useState("library");
   const [accentColor, setAccentColor] = useState("#6c47ff");
+  const [gridSize, setGridSize] = useState("medium");
 
   useEffect(() => {
     async function initStore() {
@@ -39,14 +40,21 @@ function App() {
       }
       const savedAccent = await s.get("accentColor");
       if (savedAccent) setAccentColor(savedAccent);
+      const savedGrid = await s.get("gridSize");
+      if (savedGrid) setGridSize(savedGrid);
       setStore(s);
     }
     initStore();
   }, []);
+
   useEffect(() => {
     document.documentElement.style.setProperty("--accent", accentColor);
     if (store) store.set("accentColor", accentColor);
   }, [accentColor, store]);
+
+  useEffect(() => {
+    if (store) store.set("gridSize", gridSize);
+  }, [gridSize, store]);
 
   function addGame() {
     if (newGame.name === "" || newGame.path === "") return;
@@ -82,7 +90,6 @@ function App() {
       );
       setGames(updated);
       if (store) store.set("games", updated);
-
       const recent = [...updated]
         .filter((g) => g.lastPlayed)
         .sort((a, b) => b.lastPlayed - a.lastPlayed)
@@ -92,6 +99,7 @@ function App() {
       alert("Failed to launch:" + e);
     }
   }
+
   async function browsePath() {
     const selected = await open({
       filters: [{ name: "Executable", extensions: ["exe"] }],
@@ -209,7 +217,7 @@ function App() {
               </div>
             )}
 
-            <div className="game-grid">
+            <div className={`game-grid ${gridSize}`}>
               {games.length === 0 ? (
                 <div className="empty-state">
                   <p>No games yet.</p>
@@ -284,9 +292,39 @@ function App() {
                 />
               </div>
             </div>
+
+            <div className="settings-section">
+              <h2 className="settings-label">Grid Size</h2>
+              <div className="grid-size-options">
+                {["small", "medium", "large"].map((size) => (
+                  <button
+                    key={size}
+                    className={`grid-size-btn ${gridSize === size ? "active" : ""}`}
+                    onClick={() => setGridSize(size)}
+                  >
+                    {size.charAt(0).toUpperCase() + size.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         )}
       </div>
+
+      {contextMenu && (
+        <div
+          className="context-menu"
+          style={{ top: contextMenu.y, left: contextMenu.x }}
+          onClick={closeContextMenu}
+        >
+          <button
+            className="context-item delete"
+            onClick={() => removeGame(contextMenu.gameId)}
+          >
+            🗑 Remove Game
+          </button>
+        </div>
+      )}
     </div>
   );
 }

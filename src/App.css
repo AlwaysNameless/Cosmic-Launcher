@@ -359,3 +359,34 @@ nav {
   border: none;
   border-radius: 50%;
 }
+
+.grid-size-options {
+  display: flex;
+  gap: 8px;
+}
+
+.grid-size-btn {
+  background: #1e1e1e;
+  border: 1px solid #3a3a3a;
+  color: #aaaaaa;
+  padding: 8px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.grid-size-btn.active {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+}
+
+.game-grid.small .game-card {
+  width: 120px;
+}
+.game-grid.medium .game-card {
+  width: 160px;
+}
+.game-grid.large .game-card {
+  width: 200px;
+}
