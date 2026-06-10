@@ -4,6 +4,8 @@ import "./App.css";
 import { invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
 import { openUrl } from "@tauri-apps/plugin-opener";
+import { check } from "@tauri-apps/plugin-updater";
+import { relaunch } from "@tauri-apps/plugin-process";
 
 function App() {
   const [games, setGames] = useState([]);
@@ -50,6 +52,24 @@ function App() {
       setStore(s);
     }
     initStore();
+
+    async function checkForUpdates() {
+      try {
+        const update = await check();
+        if (update) {
+          const yes = confirm(
+            `Update ${update.version} available! Install now?`,
+          );
+          if (yes) {
+            await update.downloadAndInstall();
+            await relaunch();
+          }
+        }
+      } catch (e) {
+        console.error("Update check failed:", e);
+      }
+    }
+    checkForUpdates();
   }, []);
 
   useEffect(() => {
@@ -104,9 +124,8 @@ function App() {
         .sort((a, b) => b.lastPlayed - a.lastPlayed)
         .slice(0, 5);
       setRecentGames(recent);
-      if (selectedGame?.id === game.id) {
+      if (selectedGame?.id === game.id)
         setSelectedGame(updated.find((g) => g.id === game.id));
-      }
     } catch (e) {
       alert("Failed to launch:" + e);
     }
@@ -116,9 +135,7 @@ function App() {
     const selected = await open({
       filters: [{ name: "Executable", extensions: ["exe"] }],
     });
-    if (selected) {
-      setNewGame({ ...newGame, path: selected });
-    }
+    if (selected) setNewGame({ ...newGame, path: selected });
   }
 
   async function handleNameChange(e) {
@@ -236,7 +253,7 @@ function App() {
                       <div className="game-playtime">
                         {game.playtime
                           ? `${Math.floor(game.playtime / 3600)}h ${Math.floor((game.playtime % 3600) / 60)}m`
-                          : "Never played"}
+                          : ""}
                       </div>
                     </div>
                   ))}
@@ -304,7 +321,6 @@ function App() {
         {currentView === "settings" && (
           <div className="settings-page">
             <h1>Settings</h1>
-
             <div className="settings-section">
               <h2 className="settings-label">Accent Color</h2>
               <div className="color-options">
@@ -331,7 +347,6 @@ function App() {
                 />
               </div>
             </div>
-
             <div className="settings-section">
               <h2 className="settings-label">Grid Size</h2>
               <div className="grid-size-options">
@@ -346,7 +361,6 @@ function App() {
                 ))}
               </div>
             </div>
-
             <div className="settings-section">
               <h2 className="settings-label">Categories</h2>
               <div className="category-tags">
@@ -379,12 +393,11 @@ function App() {
                 </button>
               </div>
             </div>
-
             <div className="settings-section">
               <h2 className="settings-label">About</h2>
               <div className="about-card">
                 <div className="about-logo">🌃 Cosmic Launcher</div>
-                <div className="about-version">Version 1.0.0</div>
+                <div className="about-version">Version 1.1.0</div>
                 <div className="about-credit">
                   Made by <span className="about-name">AlwaysNameless</span>
                 </div>

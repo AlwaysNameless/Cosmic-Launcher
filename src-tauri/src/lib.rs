@@ -4,10 +4,8 @@ use tauri_plugin_http::reqwest;
 #[tauri::command]
 async fn launch_game(path: String) -> Result<u64, String> {
     let start = std::time::Instant::now();
-    
-    let game_dir = std::path::Path::new(&path)
-        .parent()
-        .ok_or("Invalid path")?;
+
+    let game_dir = std::path::Path::new(&path).parent().ok_or("Invalid path")?;
 
     Command::new(&path)
         .current_dir(game_dir)
@@ -77,6 +75,7 @@ async fn search_game_covers(name: String) -> Result<Vec<serde_json::Value>, Stri
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_dialog::init())

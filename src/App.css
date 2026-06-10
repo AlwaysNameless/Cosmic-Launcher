@@ -589,3 +589,14 @@ nav {
 .about-link:hover {
   color: var(--accent);
 }
+
+.recent-grid .game-card {
+  width: 160px;
+  flex-shrink: 0;
+}
+
+.recent-grid .game-cover {
+  width: 160px;
+  height: 213px;
+  aspect-ratio: unset;
+}
