@@ -26,6 +26,7 @@ function App() {
   const [currentView, setCurrentView] = useState("library");
   const [accentColor, setAccentColor] = useState("#6c47ff");
   const [gridSize, setGridSize] = useState("medium");
+  const [selectedGame, setSelectedGame] = useState(null);
 
   useEffect(() => {
     async function initStore() {
@@ -102,6 +103,9 @@ function App() {
         .sort((a, b) => b.lastPlayed - a.lastPlayed)
         .slice(0, 5);
       setRecentGames(recent);
+      if (selectedGame?.id === game.id) {
+        setSelectedGame(updated.find((g) => g.id === game.id));
+      }
     } catch (e) {
       alert("Failed to launch:" + e);
     }
@@ -153,6 +157,7 @@ function App() {
     setCategories([...categories, trimmed]);
     setNewCategory("");
   }
+
   function removeCategory(cat) {
     if (cat === "All" || cat === "Other") return;
     setCategories(categories.filter((c) => c !== cat));
@@ -208,7 +213,10 @@ function App() {
                     <div
                       className="game-card"
                       key={game.id}
-                      onClick={() => launchGame(game)}
+                      onClick={() => {
+                        setSelectedGame(game);
+                        setCurrentView("details");
+                      }}
                       onContextMenu={(e) => handleRightClick(e, game.id)}
                     >
                       <div
@@ -252,7 +260,10 @@ function App() {
                     <div
                       className="game-card"
                       key={game.id}
-                      onClick={() => launchGame(game)}
+                      onClick={() => {
+                        setSelectedGame(game);
+                        setCurrentView("details");
+                      }}
                       onContextMenu={(e) => handleRightClick(e, game.id)}
                     >
                       <div
@@ -325,6 +336,7 @@ function App() {
                 ))}
               </div>
             </div>
+
             <div className="settings-section">
               <h2 className="settings-label">Categories</h2>
               <div className="category-tags">
@@ -359,7 +371,125 @@ function App() {
             </div>
           </div>
         )}
+
+        {currentView === "details" && selectedGame && (
+          <div className="details-page">
+            <button
+              className="back-btn"
+              onClick={() => setCurrentView("library")}
+            >
+              ← Back
+            </button>
+            <div className="details-content">
+              <div
+                className="details-cover"
+                style={
+                  selectedGame.cover
+                    ? {
+                        backgroundImage: `url(${selectedGame.cover})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      }
+                    : {}
+                }
+              ></div>
+              <div className="details-info">
+                <h1 className="details-title">{selectedGame.name}</h1>
+                <p className="details-meta">
+                  Category: {selectedGame.category || "Other"}
+                </p>
+                <p className="details-meta">
+                  Playtime:{" "}
+                  {selectedGame.playtime
+                    ? `${Math.floor(selectedGame.playtime / 3600)}h ${Math.floor((selectedGame.playtime % 3600) / 60)}m`
+                    : "Never played"}
+                </p>
+                <p className="details-meta">
+                  Last played:{" "}
+                  {selectedGame.lastPlayed
+                    ? new Date(selectedGame.lastPlayed).toLocaleDateString()
+                    : "Never"}
+                </p>
+                <div className="details-actions">
+                  <button
+                    className="add-btn"
+                    onClick={() => launchGame(selectedGame)}
+                  >
+                    ▶ Launch
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h2>Add Game</h2>
+            <input
+              className="modal-input"
+              placeholder="Game name"
+              value={newGame.name}
+              onChange={handleNameChange}
+            />
+            {coverResults.length > 0 && (
+              <div className="cover-results">
+                {coverResults.map((result) => (
+                  <img
+                    key={result.id}
+                    src={result.url}
+                    alt="cover"
+                    className={`cover-option ${selectedCover === result.url ? "selected" : ""}`}
+                    onClick={() => setSelectedCover(result.url)}
+                  />
+                ))}
+              </div>
+            )}
+            <select
+              className="modal-input"
+              value={newGame.category}
+              onChange={(e) =>
+                setNewGame({ ...newGame, category: e.target.value })
+              }
+            >
+              <option value="">Select category</option>
+              {categories
+                .filter((c) => c !== "All")
+                .map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+            </select>
+            <div className="path-row">
+              <input
+                className="modal-input"
+                placeholder="Path to .exe"
+                value={newGame.path}
+                onChange={(e) =>
+                  setNewGame({ ...newGame, path: e.target.value })
+                }
+              />
+              <button className="browse-btn" onClick={browsePath}>
+                Browse
+              </button>
+            </div>
+            <div className="modal-buttons">
+              <button
+                className="cancel-btn"
+                onClick={() => setShowModal(false)}
+              >
+                Cancel
+              </button>
+              <button className="confirm-btn" onClick={addGame}>
+                Add Game
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {contextMenu && (
         <div
