@@ -4,12 +4,14 @@ use tauri_plugin_http::reqwest;
 #[tauri::command]
 async fn launch_game(path: String) -> Result<u64, String> {
     let start = std::time::Instant::now();
+    
+    let game_dir = std::path::Path::new(&path)
+        .parent()
+        .ok_or("Invalid path")?;
 
-    Command::new("cmd")
-        .args(["/C", "start", "/wait", "", &path])
+    Command::new(&path)
+        .current_dir(game_dir)
         .spawn()
-        .map_err(|e| e.to_string())?
-        .wait()
         .map_err(|e| e.to_string())?;
 
     let elapsed = start.elapsed().as_secs();
